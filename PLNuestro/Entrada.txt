@@ -1,0 +1,42 @@
+program EjemploAprobado; 
+function areaCuadrado ( lado: REAL ) : REAL ;
+var
+	resultado: REAL;
+begin
+	resultado := +0.0;
+	resultado := lado * lado;
+	areaCuadrado := resultado; 
+end; 
+procedure intercambio ( v1, v2: INTEGER )  ;
+var
+	aux: INTEGER;
+begin
+	aux := 0;
+	aux := v1;
+	v1 := v2;
+	v2 := aux;
+end;
+var
+	medida: REAL;
+	valor1, valor2: INTEGER;
+begin
+	if (media=2) then
+	begin
+		medida := $4.A;
+	end;
+	while (media=2) do
+	begin
+		medida := areaCuadrado( medida );
+	end;
+	case media of
+		0 : media:= 15;
+	end;
+	for i:=1 to media do
+	begin
+		media:= media + 1;
+	end;
+	valor1 := -3;
+	valor2 := $F6;
+	medida := areaCuadrado( medida );
+	intercambio(valor1, valor2);
+end.

@@ -1,0 +1,43 @@
+program EjemploAprobado;
+type
+tnuevo = RECORD
+nombre: string;
+num: integer;
+END;
+tnu = num;
+function areaCuadrado ( lado: REAL ) : REAL ;
+var
+	resultado: REAL;
+begin
+	resultado := +0.0;
+	resultado := lado * lado;
+	areaCuadrado := resultado; 
+end; 
+procedure intercambio ( v1, v2: INTEGER )  ;
+var
+	aux: INTEGER;
+begin
+if (a=b) then
+begin
+	aux := 0;
+end
+else
+begin
+	aux := v1;
+end;
+while (a<b) do
+begin
+	a := b-1;
+end;
+	v2 := aux;
+end;
+var
+	medida: REAL;
+	valor1, valor2: INTEGER;
+begin
+	medida := $4.A;
+	valor1 := -3;
+	valor2 := $F6;
+	medida := areaCuadrado( medida );
+	intercambio(valor1, valor2);
+end.

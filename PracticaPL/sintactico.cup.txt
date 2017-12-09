@@ -1,0 +1,83 @@
+/*   
+   PRG ::= "program" identifier  ";" BLQ "."
+   BLQ ::= DCLLIST "begin" SENTLIST "end"
+   DCLLIST ::= lambda | DCLLIST ";" DCL
+   SENTLIST ::= SENT | SENTLIST ";" SENT   
+La zona de declaraciones es una lista de declaraciones de constantes, tipos, variables, procedimientos y/o funciones.
+   DCL ::= DEFCTE | DEFVAR | DEFPROC | DEFFUN
+   DEFCTE ::= "const" CTELIST
+   CTELIST ::= identifier "=" SIMPVALUE ";"
+             | CTELIST identifier "=" SIMPVALUE ";"
+   SIMPVALUE ::= numeric_integer_const | numeric_real_const | string_const
+
+   DEFVAR ::= "var" DEFVARLIST 
+   DEFVARLIST ::= VARLIST ":" TBAS ";"
+                | VARLIST ":" TBAS ";" DEFVARLIST
+   VARLIST ::= identifier | identifier "," VARLIST
+   DEFPROC ::=  "procedure" identifier FORMAL_PARAMLIST ";" BLQ ";" 
+   DEFFUN ::=  "function" identifier FORMAL_PARAMLIST ":" TBAS ";" BLQ ";" 
+   FORMAL_PARAMLIST ::= lambda | "(" FORMAL_PARAM ")" 
+   FORMAL_PARAM ::= VARLIST ":" TBAS 
+                  | VARLIST ":" TBAS ";" FORMAL_PARAM
+   TBAS ::= "INTEGER" | "REAL" | "CHARACTER"
+La zona de sentencias es una lista de sentencias como asignaciones, sentencias de flujo, llamadas a procedimientos y bloques de ejecución anónimos:
+   SENT ::= ASIG | PROC_CALL | EXEBLQ
+   ASIG ::= ID ":=" EXP 
+   ID := identifier
+   EXP ::= EXP OP EXP | FACTOR 
+   OP ::= OPCOMP | OPLOG | OPARIT 
+   OPCOMP ::= "<" | ">" | "<=" | ">=" | "=" | "<>"
+   OPARIT ::= "+" | "-" | "*" | "div" | "mod"
+   OPLOG ::= "or" | "and"
+   FACTOR ::= SIMPVALUE | "not" FACTOR 
+            | "(" EXP ")" | identifier SUBPPARAMLIST
+   SUBPPARAMLIST ::= lambda | "(" EXPLIST ")"
+   EXPLIST ::= EXP | EXP "," EXPLIST
+   PROC_CALL ::= identifier SUBPPARAMLIST
+   EXEBLQ ::= DCLLIST_BLQ "begin" SENTLIST "end" 
+   DCLLIST_BLQ ::= lambda | DCLLIST_BLQ ";" DCL_BLQ
+   DCL_BLQ ::= DEFCTE | DEFTYPE | DEFVAR
+*/
+/*aqui comienza el programa*/
+import java_cup.runtime.*;
+terminal program,identifier,begin,end,lambda,const,numeric_integer_const,numeric_real_const,string_const,var,dos_puntos,punto_coma,punto,coma,procedure,function,abrir_paren,cerrar_paren;
+terminal op_asignacion,op_menor,op_mayor,op_menorIgual,op_mayorIgual,op_igual,op_distinto,op_suma,op_resta,op_mult,op_div,op_mod,op_or,op_and,op_not,integer,real,char;
+non terminal PRG,BLQ,DCLLIST,SENTLIST,DCL,DEFCTE,CTELIST,SIMPVALUE,DEFVAR,DEFVARLIST,VARLIST,DEFPROC,DEFFUN,FORMAL_PARAMLIST,FORMAL_PARAM,TBAS,SENT,ASIG,ID,EXP,OP,OPCOMP;
+non terminal OPARIT,OPLOG,FACTOR,SUBPPARAMLIST,EXPLIST,PROC_CALL,EXEBLQ,DCLLIST_BLQ,DCL_BLQ;
+  
+   PRG ::= program identifier punto_coma BLQ punto
+   BLQ ::= DCLLIST begin SENTLIST end
+   DCLLIST ::= lambda | DCLLIST punto_coma DCL
+   SENTLIST ::= SENT | SENTLIST punto_coma SENT   
+   DCL ::= DEFCTE | DEFVAR | DEFPROC | DEFFUN
+   DEFCTE ::= const CTELIST
+   CTELIST ::= identifier op_igual SIMPVALUE punto_coma
+             | CTELIST identifier op_igual SIMPVALUE punto_coma
+   SIMPVALUE ::= numeric_integer_const | numeric_real_const | string_const
+
+   DEFVAR ::= var DEFVARLIST 
+   DEFVARLIST ::= VARLIST dos_puntos TBAS punto_coma
+                | VARLIST dos_puntos TBAS punto_coma DEFVARLIST
+   VARLIST ::= identifier | identifier punto_coma VARLIST
+   DEFPROC ::=  procedure identifier FORMAL_PARAMLIST punto_coma BLQ punto_coma 
+   DEFFUN ::=  function identifier FORMAL_PARAMLIST dos_puntos TBAS punto_coma BLQ punto_coma 
+   FORMAL_PARAMLIST ::= lambda | abrir_paren FORMAL_PARAM cerrar_paren 
+   FORMAL_PARAM ::= VARLIST dos_puntos TBAS 
+                  | VARLIST dos_puntos TBAS punto_coma FORMAL_PARAM
+   TBAS ::= integer | real | char
+   SENT ::= ASIG | PROC_CALL | EXEBLQ
+   ASIG ::= ID op_asignacion EXP 
+   ID := identifier
+   EXP ::= EXP OP EXP | FACTOR 
+   OP ::= OPCOMP | OPLOG | OPARIT 
+   OPCOMP ::= op_menor | op_mayor | op_menorIgual | op_mayorIgual | op_igual | op_distinto
+   OPARIT ::= op_suma | op_resta | op_mult | op_div | op_mod
+   OPLOG ::= op_or | op_and
+   FACTOR ::= SIMPVALUE | op_not FACTOR 
+            | abrir_paren EXP cerrar_paren | identifier SUBPPARAMLIST
+   SUBPPARAMLIST ::= lambda | abrir_paren EXPLIST cerrar_paren
+   EXPLIST ::= EXP | EXP coma EXPLIST
+   PROC_CALL ::= identifier SUBPPARAMLIST
+   EXEBLQ ::= DCLLIST_BLQ begin SENTLIST end 
+   DCLLIST_BLQ ::= lambda | DCLLIST_BLQ punto_coma DCL_BLQ
+   DCL_BLQ ::= DEFCTE | DEFTYPE | DEFVAR

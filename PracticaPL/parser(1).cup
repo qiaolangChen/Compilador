@@ -1,0 +1,77 @@
+import java_cup.runtime.*;
+
+terminal program, identifier, begin, end, punto, punto_coma;
+terminal integer, real, char_, const_, op_igual, var, dos_puntos, coma;
+terminal numeric_integer_const, numeric_integerHex_const, numeric_real_const, numeric_realHex_const, string_const;
+terminal procedure, function, abrir_paren, cerrar_paren, abrir_corchete, cerrar_corchete;
+terminal op_asignacion, op_menor, op_mayor, op_menorIgual, op_mayorIgual; op_distinto;
+terminal op_suma, op_resta, op_mult, op_divEntero, op_mod, op_or, op_and, op_not;
+terminal if_, then, else_, while_, do_, for_, to, case_, of;
+
+non terminal PRG, BLQ, DCLLIST, DCL, SENTLIST, SENT;
+non terminal ALLTYPES, DEFCTE, CTELIST, SIMPVALUE, DEFTYPE, TYPELIST, UDTYPE, DEFVAR, DEFVARLIST, VARLIST, TBAS, DEFPROC, FORMAL_PARAMLIST, FORMAL_PARAM, DEFFUN;
+non terminal SENT, ASIG, ID, EXP, OP, OPCOMP, OPARIT, OPLOG, FACTOR, SUBPPARAMLIST, EXPLIST, PROC_CALL, EXEBLQ, DCLLIST_BLQ;
+non terminal COND, ELSECOND, WLOOP, FLOOP, CASE, CASELIST;
+
+PRG ::= program identifier punto_coma BLQ punto;
+BLQ ::= DCLLIST begin SENTLIST end | begin SENTLIST end;
+DCLLIST ::= DCLLIST DCL | DCL;
+SENTLIST ::= SENT | SENTLIST SENT;
+
+DCL ::= DEFCTE | DEFTYPE | DEFVAR | DEFPROC | DEFFUN;
+
+DEFCTE ::= const_ CTELIST;
+CTELIST ::= identifier op_igual SIMPVALUE punto_coma | CTELIST identifier op_igual SIMPVALUE punto_coma;
+
+DEFTYPE ::= type TYPELIST;
+TYPELIST ::= identifier op_igual UDTYPE punto_coma | identifier op_igual UDTYPE punto_coma TYPELIST;
+UDTYPE ::= array abrir_corchete SIMPVALUE punto punto SIMPVALUE cerrar_corchete of ALLTYPES;
+
+SIMPVALUE ::= numeric_integer_const | numeric_integerHex_const | numeric_real_const | numeric_realHex_const | string_const;
+
+DEFVAR ::= var DEFVARLIST punto_coma;
+DEFVARLIST ::= VARLIST dos_puntos ALLTYPES | DEFVARLIST punto_coma VARLIST dos_puntos ALLTYPES;
+
+VARLIST ::= identifier | identifier coma VARLIST;
+DEFPROC ::= procedure identifier FORMAL_PARAMLIST punto_coma BLQ punto_coma
+			| procedure identifier punto_coma BLQ punto_coma;
+DEFFUN ::= function identifier FORMAL_PARAMLIST dos_puntos ALLTYPES punto_coma BLQ punto_coma
+			| function identifier dos_puntos ALLTYPES punto_coma BLQ punto_coma;
+
+FORMAL_PARAMLIST ::= abrir_paren FORMAL_PARAM cerrar_paren;
+FORMAL_PARAM ::= VARLIST dos_puntos ALLTYPES | VARLIST dos_puntos ALLTYPES punto_coma FORMAL_PARAM;
+TBAS ::= integer | real | char_;
+
+ALLTYPES ::= TBAS | identifier;
+
+SENT ::= ASIG punto_coma | PROC_CALL punto_coma | EXEBLQ | COND | WLOOP | FLOOP | CASE;
+
+COND ::= if_ EXP then SENT | if_ EXP then SENT ELSECOND;
+ELSECOND ::= else_ SENT;
+
+WLOOP ::= while_ EXP do_ SENT;
+
+FLOOP ::= for_ identifier op_asignacion EXP to EXP do_ SENT;
+
+CASE ::= case_ EXP of CASELIST end;
+CASELIST ::= EXP dos_puntos SENT punto_coma | EXP dos_puntos SENT punto_coma CASELIST;
+
+ASIG ::= ID op_asignacion EXP;
+ID ::= identifier | identifier abrir_corchete EXP cerrar_corchete;
+EXP ::= EXP OP EXP | FACTOR;
+
+OP ::= OPCOMP | OPLOG | OPARIT;
+OPCOMP ::= op_menor | op_mayor | op_menorIgual | op_mayorIgual | op_igual | op_distinto;
+OPARIT ::= op_suma | op_resta | op_mult | op_divEntero | op_mod;
+OPLOG ::= op_or | op_and;
+
+FACTOR ::= SIMPVALUE | op_not FACTOR | abrir_paren EXP cerrar_paren | identifier SUBPPARAMLIST
+			| identifier abrir_corchete EXP cerrar_corchete | identifier;
+			
+SUBPPARAMLIST ::= abrir_paren EXPLIST cerrar_paren;
+EXPLIST ::= EXP | EXP coma EXPLIST;
+PROC_CALL ::= identifier SUBPPARAMLIST | identifier;
+EXEBLQ ::= DCLLIST_BLQ begin SENTLIST end | begin SENTLIST end;
+DCLLIST_BLQ ::= DCLLIST_BLQ punto_coma DCL_BLQ;
+DCL_BLQ ::= DEFCTE | DEFTYPE | DEFVAR;
+

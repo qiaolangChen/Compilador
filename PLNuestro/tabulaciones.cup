@@ -1,0 +1,747 @@
+package practicapl;
+import java_cup.runtime.*; 
+
+terminal String identifier;
+terminal program, begin, end, punto, punto_coma;
+terminal integer, real, char_, const_, op_igual, var, dos_puntos, coma;
+terminal String numeric_integer_const; 
+terminal String numeric_integerHex_const;
+terminal String numeric_real_const;
+terminal String numeric_realHex_const;
+terminal String string_const;
+terminal procedure, function, abrir_paren, cerrar_paren, abrir_corchete, cerrar_corchete;
+terminal op_asignacion, op_menor, op_mayor, op_menorIgual, op_mayorIgual, op_distinto;
+terminal op_suma, op_resta, op_mult, op_divEntero, op_mod, op_or, op_and, op_not, op_divReal;
+terminal if_, then, else_, while_, do_, for_, to, case_, of, type, array, record;
+
+non terminal Simbolo PRG; 
+non terminal Simbolo BLQ; 
+non terminal Simbolo DCLLIST;
+non terminal Simbolo DCL;
+non terminal Simbolo SENTLIST; 
+non terminal Simbolo SENT;
+non terminal Simbolo ALLTYPES;
+non terminal Simbolo DEFCTE;
+non terminal Simbolo CTELIST; 
+non terminal Simbolo SIMPVALUE; 
+non terminal Simbolo DEFTYPE; 
+non terminal Simbolo TYPELIST; 
+non terminal Simbolo UDTYPE; 
+non terminal Simbolo DEFVAR; 
+non terminal Simbolo DEFVARLIST;
+non terminal Simbolo VARLIST; 
+non terminal Simbolo TBAS;
+non terminal Simbolo DEFPROC;
+non terminal Simbolo FORMAL_PARAMLIST; 
+non terminal Simbolo FORMAL_PARAM;
+non terminal Simbolo DEFFUN;
+non terminal Simbolo ASIG;
+non terminal Simbolo ID;
+non terminal Simbolo EXP; 
+non terminal Simbolo OP; 
+non terminal Simbolo OPCOMP; 
+non terminal Simbolo OPARIT; 
+non terminal Simbolo OPLOG; 
+non terminal Simbolo FACTOR; 
+non terminal Simbolo SUBPPARAMLIST;
+non terminal Simbolo EXPLIST; 
+non terminal Simbolo PROC_CALL; 
+non terminal Simbolo EXEBLQ; 
+non terminal Simbolo DCLLIST_BLQ;
+non terminal Simbolo COND; 
+non terminal Simbolo ELSECOND; 
+non terminal Simbolo WLOOP;
+non terminal Simbolo FLOOP; 
+non terminal Simbolo CASE; 
+non terminal Simbolo CASELIST;
+non terminal Simbolo DCL_BLQ;
+
+precedence left op_menor;
+precedence left op_mayor;
+precedence left op_mayorIgual;
+precedence left op_menorIgual;
+precedence left op_igual;
+precedence left op_distinto;
+precedence left op_suma;
+precedence left op_resta;
+precedence left op_mod;
+precedence left op_mult;
+precedence left op_divEntero;
+precedence left op_divReal;
+precedence left op_not;
+precedence left op_or;
+precedence left op_and;
+precedence left else_;
+precedence left if_;
+
+start with PRG;  
+
+PRG ::= program identifier:iden punto_coma {: System.out.println("<!DOCTYPE html><HTML><head><title>EjNotable.pl</title><style>"
+		+".cte {color:rgb(19,189,72);}"
+		+".ident {color:rgb(55,40,244);}"
+		+".palres {color:red;font-weight:bold;}"
+		+".tabul {text-indent: 0.5cm;}"
+		+"</style></head><BODY>"
+		+"<A NAME=\"inicio\"><H1>Programa:"
+		+iden
+		+";</H1><H2>Funciones y procedimientos</H2>"); :}BLQ:blq punto
+{: 
+	Simbolo prg = new Simbolo();
+	prg.valor1= (blq.valor1+"</BODY></HTML>");
+	
+	System.out.println(prg.valor1);
+:}; 
+
+BLQ ::= DCLLIST:dcllist begin SENTLIST:sentlist end
+{:	
+	Simbolo blq = new Simbolo();
+	//En valor1 esta los subprogrmas y en valor2 los variables
+	
+	blq.valor1 = "<A HREF=\"#ProgPpal\">Programa Principal</A><BR/>"
+		+ dcllist.valor1
+		+"<HR><A NAME=\"ProgPpal\"><H2>Programa Principal</H2>"
+		+ dcllist.valor2
+		+"<BR/><SPAN CLASS=\"palres\">begin</SPAN>"
+		+"<DIV CLASS=\"tabul\">"+sentlist.valor1+"</DIV>"
+		+"<SPAN CLASS=\"palres\">end</SPAN>.<BR/>"
+		+"<A HREF=\"#ProgPpal\">Inicio del programa principal</A><BR/>"
+		+"<A HREF=\"#inicio\">Inicio de programa</A><BR/>";
+	RESULT=blq;
+
+:};
+
+BLQ ::= begin SENTLIST:sentlist end
+{:	
+	Simbolo blq = new Simbolo();
+	//En valor1 esta los subprogrmas y en valor2 los variables
+	blq.valor1 = "<A NAME=\"ProgPpal\"><H2>Programa Principal</H2>"
+		+"<BR/><SPAN CLASS=\"palres\">begin</SPAN>"
+		+"<DIV CLASS=\"tabul\">"+sentlist.valor1+"</DIV>"
+		+"<SPAN CLASS=\"palres\">end</SPAN>.<BR/>"
+		+"<A HREF=\"#ProgPpal\">Inicio del programa principal</A><BR/>"
+		+"<A HREF=\"#inicio\">Inicio de programa</A><BR/>";
+	RESULT=blq;
+	//////////////-----------------------------------------------------------------------------------
+:};
+
+DCLLIST ::= DCLLIST:dcllist1 DCL:dcl
+{:
+	Simbolo dcllist = new Simbolo();
+	dcllist.valor1=dcllist1.valor1 //dcllist1.valor1+dcl.valor1
+	+ dcl.valor1;
+	dcllist.valor2=dcllist1.valor2
+	+ dcl.valor2;   //dcllist1.valor2+dcl.valor2
+	RESULT=dcllist;
+:};
+DCLLIST ::= DCL:dcl
+{:
+	Simbolo dcllist = new Simbolo();
+	dcllist.valor1=dcl.valor1; //dcl.valor1
+	dcllist.valor2=dcl.valor2;   //dcl.valor2
+	RESULT=dcllist;
+:};
+
+SENTLIST ::= SENTLIST:sentlist1 SENT:sent
+{:
+	Simbolo sentlist = new Simbolo();
+	sentlist.valor1=sentlist1.valor1+sent.valor1;
+	RESULT=sentlist;
+:};
+SENTLIST ::= SENT:sent
+{:	
+	Simbolo sentlist = new Simbolo();
+	sentlist.valor1=sent.valor1;
+	RESULT=sentlist;
+:};
+
+DCL ::= DEFCTE:defcte
+{:	
+	Simbolo dcl = new Simbolo();
+	dcl.valor1 = "";
+	dcl.valor2 = defcte.valor2;
+	RESULT= dcl;
+:};
+DCL ::= DEFTYPE:deftype
+{:	
+	Simbolo dcl = new Simbolo();
+	dcl.valor1 = "";
+	dcl.valor2 = deftype.valor2;
+	RESULT= dcl;
+:};
+DCL ::= DEFVAR:defvar
+{:	
+	Simbolo dcl = new Simbolo();
+	dcl.valor1 = "";
+	dcl.valor2 = defvar.valor2;
+	RESULT= dcl;
+:};
+DCL ::= DEFPROC:defproc
+{:	
+	Simbolo dcl = new Simbolo();
+	dcl.valor1 = defproc.valor1;
+	dcl.valor2 = "";
+	RESULT= dcl;
+:};
+DCL ::= DEFFUN:deffun
+{:	
+	Simbolo dcl = new Simbolo();
+	dcl.valor1 = deffun.valor1;
+	dcl.valor2 = "";
+	RESULT= dcl;
+:};
+
+DEFCTE ::= const_ CTELIST:ctelist
+{:	
+	Simbolo defcte = new Simbolo();
+	defcte.valor1 = "";
+	defcte.valor2="<SPAN CLASS=\"palres\">CONST &nbsp;</SPAN>" + "<DIV CLASS=\"tabul\">" + ctelist.valor1 + "</DIV>";
+	RESULT=defcte;
+:};
+CTELIST ::= identifier:iden op_igual SIMPVALUE:simpvalue punto_coma
+{:	
+	Simbolo ctelist = new Simbolo();
+	ctelist.valor1 = "<A NAME=\""+iden+"\"><SPAN CLASS=\"ident\">"+iden+"</SPAN></A>="+simpvalue.valor1+";<BR>";
+	RESULT= ctelist;
+:};
+CTELIST ::= CTELIST:ctelist1 identifier:iden op_igual SIMPVALUE:simpvalue punto_coma
+{:	
+	Simbolo ctelist = new Simbolo();
+	ctelist.valor1 = ctelist1.valor1
+	+ "<A NAME=\""+iden+"\"><SPAN CLASS=\"ident\">"+iden+"</SPAN></A>="+simpvalue.valor1+";<BR>";
+	RESULT= ctelist;
+:};
+DEFTYPE ::= type TYPELIST:typelist
+{:	
+	Simbolo deftype = new Simbolo();
+	deftype.valor1 = "";
+	deftype.valor2="<SPAN CLASS=\"palres\">TYPE &nbsp;</SPAN>" + "<DIV CLASS=\"tabul\">" + typelist.valor1 + "</DIV><BR>";
+	RESULT= deftype;
+:};
+TYPELIST ::= identifier:iden op_igual UDTYPE:udtype punto_coma
+{:	
+	Simbolo typelist = new Simbolo();
+	typelist.valor1 = "<A NAME=\""+iden+"\"><SPAN CLASS=\"ident\">"+iden+"</SPAN></A>="+udtype.valor1+";";
+	RESULT= typelist;
+:};
+TYPELIST ::= identifier:iden op_igual UDTYPE:udtype punto_coma TYPELIST:typelist1
+{:	
+	Simbolo typelist = new Simbolo();
+	typelist.valor1 = "<A NAME=\""+iden+"\"><SPAN CLASS=\"ident\">"+iden+"</SPAN></A>="+udtype.valor1+";" + typelist1.valor1;
+	RESULT= typelist;
+:};
+UDTYPE ::= array abrir_corchete SIMPVALUE:simpvalue1 punto punto SIMPVALUE:simpvalue2 cerrar_corchete of ALLTYPES:alltypes
+{:	
+	Simbolo udtype = new Simbolo();
+	udtype.valor1 = "array [" + simpvalue1.valor1 + ".." + simpvalue2.valor1 + "] of " + alltypes.valor1;
+	RESULT= udtype;
+:};
+UDTYPE ::= record DEFVARLIST:defvarlist punto_coma end
+{:	
+	Simbolo udtype = new Simbolo();
+	udtype.valor1 = "RECORD " + "<DIV CLASS=\"tabul\">" + defvarlist.valor1 + "</DIV>" + "; end";
+	RESULT= udtype;
+/////////////////////////////////////////////////////////////////////////////////////////////////
+:};
+
+SIMPVALUE ::= numeric_integer_const:nic
+{:	
+	Simbolo simpvalue = new Simbolo();
+	simpvalue.valor1=nic;
+	RESULT=simpvalue;
+:} ;
+SIMPVALUE ::= numeric_integerHex_const:nihc
+{:	
+	Simbolo simpvalue = new Simbolo();
+	simpvalue.valor1=nihc;
+	RESULT=simpvalue;
+:};
+SIMPVALUE ::= numeric_real_const:nrc
+{:	
+	Simbolo simpvalue = new Simbolo();
+	simpvalue.valor1=nrc;
+	RESULT=simpvalue;
+:};
+SIMPVALUE ::= numeric_realHex_const:nrhc
+{:	
+	Simbolo simpvalue = new Simbolo();
+	simpvalue.valor1=nrhc;
+	RESULT=simpvalue;
+:};
+SIMPVALUE ::= string_const:sc
+{:	
+	Simbolo simpvalue = new Simbolo();
+	simpvalue.valor1=sc;
+	RESULT=simpvalue;
+//////------------------------------------------------------------------------------------
+:};
+DEFVAR ::= var DEFVARLIST:defvarlist punto_coma
+{:	
+	Simbolo defvar = new Simbolo();
+	defvar.valor1= "";
+	defvar.valor2="<SPAN CLASS=\"palres\">VAR &nbsp;</SPAN>" + "<DIV CLASS=\"tabul\">" + defvarlist.valor1 + ";</DIV><BR>";
+	RESULT=defvar;
+:};
+DEFVARLIST ::= VARLIST:varlist dos_puntos ALLTYPES:alltypes
+{:	
+	Simbolo defvarlist = new Simbolo();
+	defvarlist.valor1=varlist.valor1+":"+alltypes.valor1;
+	RESULT=defvarlist;
+:};
+DEFVARLIST ::= DEFVARLIST:defvarlist1 punto_coma VARLIST:varlist dos_puntos ALLTYPES:alltypes
+{:	
+	Simbolo defvarlist = new Simbolo();
+	defvarlist.valor1=defvarlist1.valor1
+	+ ";<BR>" + varlist.valor1+":"+alltypes.valor1;
+	RESULT=defvarlist;
+:};
+VARLIST ::= identifier:iden
+{:	
+	Simbolo varlist = new Simbolo();
+	varlist.valor1="<A NAME=\""+iden+"\"><SPAN CLASS=\"ident\">"+iden+"</SPAN></A>";
+	RESULT=varlist;
+:};
+VARLIST ::= identifier:iden coma VARLIST:varlist1
+{:	
+	Simbolo varlist = new Simbolo();
+	varlist.valor1="<A NAME=\""+iden+"\"><SPAN CLASS=\"ident\">"+iden+"</SPAN></A>, " + varlist1.valor1;
+	RESULT=varlist;
+:};
+DEFPROC ::= procedure identifier:iden FORMAL_PARAMLIST:formalparamlist punto_coma {: System.out.println("PROCEDURE <SPAN CLASS=\"ident\">"+iden+"</SPAN>"+formalparamlist.valor1+";<BR>"); :} EXEBLQ:exeblq punto_coma
+{:	
+	Simbolo defproc = new Simbolo();
+	defproc.valor1="<HR>PROCEDURE <SPAN CLASS=\"ident\">"+iden+"</SPAN>"+formalparamlist.valor1+";"+"<DIV CLASS=\"tabul\">"+exeblq.valor1+"</DIV>"+"<BR>";
+	RESULT=defproc;
+:};
+DEFPROC ::= procedure identifier:iden punto_coma {: System.out.println("PROCEDURE <SPAN CLASS=\"ident\">"+iden+"</SPAN>;<BR>"); :}EXEBLQ:exeblq punto_coma
+{:	
+	Simbolo defproc = new Simbolo();
+	defproc.valor1="<HR>PROCEDURE <SPAN CLASS=\"ident\">"+iden+"</SPAN>;"+"<DIV CLASS=\"tabul\">"+exeblq.valor1+"</DIV>"+"<BR>";
+	RESULT=defproc;
+:};
+DEFFUN ::= function identifier:iden FORMAL_PARAMLIST:formalparamlist dos_puntos ALLTYPES:alltypes punto_coma {: System.out.println("FUNCTION <SPAN CLASS=\"ident\">"+iden+"</SPAN>"+formalparamlist.valor1+":"+alltypes.valor1+";<BR>"); :} EXEBLQ:exeblq punto_coma
+{:	
+	Simbolo deffun = new Simbolo();
+	deffun.valor1="<HR>FUNCTION <SPAN CLASS=\"ident\">"+iden+"</SPAN>"+formalparamlist.valor1+":"+alltypes.valor1+";"+"<DIV CLASS=\"tabul\">"+exeblq.valor1+"</DIV><BR>";
+	RESULT=deffun;
+:};
+DEFFUN ::= function identifier:iden dos_puntos ALLTYPES:alltypes punto_coma {: System.out.println("FUNCTION <SPAN CLASS=\"ident\">"+iden+"</SPAN>:"+alltypes.valor1+";<BR>"); :} EXEBLQ:exeblq punto_coma
+{:	
+	Simbolo deffun = new Simbolo();
+	deffun.valor1="<HR>FUNCTION <SPAN CLASS=\"ident\">"+iden+"</SPAN>:"+alltypes.valor1+";"+"<DIV CLASS=\"tabul\">"+exeblq.valor1+"</DIV><BR>";
+	RESULT=deffun;
+:};
+FORMAL_PARAMLIST ::= abrir_paren FORMAL_PARAM:formalparam cerrar_paren
+{:	
+	Simbolo formalparamlist = new Simbolo();
+	formalparamlist.valor1="("+formalparam.valor1+")";
+	RESULT=formalparamlist;
+:};
+FORMAL_PARAM ::= VARLIST:varlist dos_puntos ALLTYPES:alltypes
+{:	
+	Simbolo formalparam = new Simbolo();
+	formalparam.valor1=varlist.valor1+":"+alltypes.valor1;
+	RESULT=formalparam;
+:};
+FORMAL_PARAM ::= VARLIST:varlist dos_puntos ALLTYPES:alltypes punto_coma FORMAL_PARAM:formalparam1
+{:	
+	Simbolo formalparam = new Simbolo();
+	formalparam.valor1=varlist.valor1+":"+alltypes.valor1+";"+formalparam1.valor1;
+	RESULT=formalparam;
+:};
+TBAS ::= integer
+{:	
+	Simbolo tbas = new Simbolo();
+	tbas.valor1="<SPAN CLASS=\"palres\">INTEGER</SPAN>";
+	RESULT=tbas;
+:};
+TBAS ::= real:r
+{:	
+	Simbolo tbas = new Simbolo();
+	tbas.valor1="<SPAN CLASS=\"palres\">REAL</SPAN>";
+	RESULT=tbas;
+:};
+TBAS ::= char_:c
+{:	
+	Simbolo tbas = new Simbolo();
+	tbas.valor1="<SPAN CLASS=\"palres\">CHAR</SPAN>";
+	RESULT=tbas;
+:};
+
+ALLTYPES ::= TBAS:tbas
+{:	
+	Simbolo alltypes = new Simbolo();
+	alltypes.valor1=tbas.valor1;
+	RESULT=alltypes;
+:};
+ALLTYPES ::= identifier:iden
+{:	
+	Simbolo alltypes = new Simbolo();
+	alltypes.valor1="<SPAN CLASS=\"ident\">"+iden+"</SPAN>";
+	RESULT=alltypes;
+/////////////////////////////////////////////////////////////////////////////////////////
+:};
+
+SENT ::= ASIG:asig punto_coma 
+{:
+	Simbolo sent = new Simbolo();
+	sent.valor1="<DIV CLASS=\"tabul\">"+asig.valor1+";</DIV>";
+	RESULT=sent;	
+:};
+SENT ::= PROC_CALL:proc punto_coma
+{:
+	Simbolo sent = new Simbolo();
+	sent.valor1="<DIV CLASS=\"tabul\">"+proc.valor1+";</DIV>";
+	RESULT=sent;
+:}; 
+SENT ::= EXEBLQ:exeblq
+{:
+	Simbolo sent = new Simbolo();
+	sent.valor1="<DIV CLASS=\"tabul\">"+exeblq.valor1+"</DIV>";
+	RESULT=sent;
+:};
+SENT ::= COND:cond 
+{:
+	Simbolo sent = new Simbolo();
+	sent.valor1="<DIV CLASS=\"tabul\">"+cond.valor1+"</DIV>";
+	RESULT=sent;
+:};
+SENT ::= WLOOP:wloop 
+{:
+	Simbolo sent = new Simbolo();
+	sent.valor1="<DIV CLASS=\"tabul\">"+wloop.valor1+"</DIV>";
+	RESULT=sent;
+:};
+SENT ::= FLOOP:floop
+{:
+	Simbolo sent = new Simbolo();
+	sent.valor1="<DIV CLASS=\"tabul\">"+floop.valor1+"</DIV>";
+	RESULT=sent;
+:}; 
+SENT ::= CASE:case_
+{:
+	Simbolo sent = new Simbolo();
+	sent.valor1="<DIV CLASS=\"tabul\">"+case_.valor1+"</DIV>";
+	RESULT=sent;
+//////////--------------------------------------------------------------------------
+:};
+COND ::= if_ EXP:exp then SENT:sent punto_coma
+{:	
+	Simbolo cond = new Simbolo();
+	cond.valor1="IF <DIV CLASS=\"tabul\">"+exp.valor1+"</DIV> THEN <DIV CLASS=\"tabul\">"+sent.valor1+"</DIV>";
+	RESULT=cond;
+:};
+COND ::= if_ EXP:exp then SENT:sent punto_coma ELSECOND:elsecond punto_coma
+{:	
+	Simbolo cond = new Simbolo();
+	cond.valor1="IF <DIV CLASS=\"tabul\">"+exp.valor1+"</DIV> THEN <DIV CLASS=\"tabul\">"+sent.valor1+"</DIV>"+elsecond.valor1;
+	RESULT=cond;
+:};
+ELSECOND ::= else_ SENT:sent
+{:	
+	Simbolo elsecond = new Simbolo();
+	elsecond.valor1="ELSE <DIV CLASS=\"tabul\">"+sent.valor1+"</DIV>";
+	RESULT=elsecond;
+:};
+WLOOP ::= while_ EXP:exp do_ SENT:sent punto_coma
+{:	
+	Simbolo wloop = new Simbolo();
+	wloop.valor1="WHILE "+exp.valor1+" DO "+"<DIV CLASS=\"tabul\">"+sent.valor1+"</DIV>";
+	RESULT=wloop;
+:};
+FLOOP ::= for_ identifier:iden op_asignacion EXP:exp1 to EXP:exp2 do_ SENT:sent punto_coma
+{:	
+	Simbolo floop = new Simbolo();
+	floop.valor1="FOR <SPAN CLASS=\"ident\">"+iden+"</SPAN> := "+exp1.valor1+" TO "+exp2.valor1+" DO "+"<DIV CLASS=\"tabul\">"+sent.valor1+"</DIV>";
+	RESULT=floop;
+:};
+CASE ::= case_ EXP:exp of CASELIST:caselist end punto_coma
+{:	
+	Simbolo case_ = new Simbolo();
+	case_.valor1="CASE "+exp.valor1+" OF <DIV CLASS=\"tabul\">"+caselist.valor1+"</DIV> END";
+	RESULT=case_;
+:};
+CASELIST ::= EXP:exp dos_puntos SENT:sent punto_coma
+{:	
+	Simbolo caselist = new Simbolo();
+	caselist.valor1=exp.valor1+": "+sent.valor1;
+	RESULT=caselist;
+:};
+CASELIST ::= EXP:exp dos_puntos SENT:sent CASELIST:caselist1
+{:	
+	Simbolo caselist = new Simbolo();
+	caselist.valor1=exp.valor1+": "+sent.valor1+caselist1.valor1;
+	RESULT=caselist;
+	////////////////////////////////////////////////////////////////////////////
+:};
+
+ASIG ::= ID:id op_asignacion EXP:exp
+{:
+	Simbolo asig = new Simbolo();
+	asig.valor1=id.valor1+" := "+exp.valor1+"</SPAN>";
+	RESULT=asig;
+:};
+ID ::= identifier:iden
+{:
+	Simbolo id = new Simbolo();
+	id.valor1="<A HREF=\"#"+iden+"\">"+iden+"</A>";
+	RESULT=id;
+:}; 
+ID ::= identifier:iden abrir_corchete EXP:exp cerrar_corchete 
+{:
+	Simbolo id = new Simbolo();
+	id.valor1="<A HREF=\"#"+iden+"\">"+iden+"</A>[<SPAN CLASS=\"cte\">"+exp.valor1+"</SPAN>]";
+	RESULT=id;
+:};
+ID ::= identifier:iden1 punto identifier:iden2
+{:
+	Simbolo id = new Simbolo();
+	id.valor1="<A HREF=\"#"+iden1+"\">"+iden1+"</A>.<SPAN CLASS=\"ident\">"+iden2+"</SPAN>";
+	RESULT=id;
+:};
+EXP ::= EXP:exp1 OP:op EXP:exp2
+{:	
+	Simbolo exp = new Simbolo();
+	exp.valor1=exp1.valor1+" "+op.valor1+" "+exp2.valor1;
+	RESULT=exp;
+:};
+EXP ::= FACTOR:factor
+{:
+	Simbolo exp = new Simbolo();
+	exp.valor1=factor.valor1;
+	RESULT=exp;	
+:};
+OP ::= OPCOMP:opcomp
+{:	
+	Simbolo op = new Simbolo();
+	op.valor1=opcomp.valor1;
+	RESULT=op;
+:};
+OP ::= OPLOG:oplog
+{:	
+	Simbolo op = new Simbolo();
+	op.valor1=oplog.valor1;
+	RESULT=op;
+:};
+OP ::= OPARIT:oparit
+{:	
+	Simbolo op = new Simbolo();
+	op.valor1=oparit.valor1;
+	RESULT=op;
+:};
+OPCOMP ::= op_menor
+{:	
+	Simbolo op = new Simbolo();
+	op.valor1=" < ";
+	RESULT=op;
+:};	
+OPCOMP ::= op_mayor
+{:	
+	Simbolo op = new Simbolo();
+	op.valor1=" > ";
+	RESULT=op;
+:};
+OPCOMP ::= op_menorIgual
+{:	
+	Simbolo op = new Simbolo();
+	op.valor1=" <= ";
+	RESULT=op;
+:};
+OPCOMP ::= op_mayorIgual
+{:	
+	Simbolo op = new Simbolo();
+	op.valor1=" >= ";
+	RESULT=op;
+:};
+OPCOMP ::= op_igual
+{:	
+	Simbolo op = new Simbolo();
+	op.valor1= " = ";
+	RESULT=op;
+:};
+OPCOMP ::= op_distinto
+{:	
+	Simbolo op = new Simbolo();
+	op.valor1=" <> ";
+	RESULT=op;
+:};
+OPARIT ::= op_suma
+{:	
+	Simbolo op = new Simbolo();
+	op.valor1=" + ";
+	RESULT=op;
+:};
+OPARIT ::= op_resta
+{:	
+	Simbolo op = new Simbolo();
+	op.valor1=" - ";
+	RESULT=op;
+:};
+OPARIT ::= op_mult
+{:	
+	Simbolo op = new Simbolo();
+	op.valor1=" * ";
+	RESULT=op;
+:};
+OPARIT ::= op_divEntero
+{:	
+	Simbolo op = new Simbolo();
+	op.valor1="<SPAN CLASS=\"palres\">div</SPAN>";
+	RESULT=op;
+:};
+OPARIT ::= op_mod
+{:	
+	Simbolo op = new Simbolo();
+	op.valor1="<SPAN CLASS=\"palres\">mod</SPAN>";
+	RESULT=op;
+:};
+OPARIT ::= op_divReal
+{:	
+	Simbolo op = new Simbolo();
+	op.valor1= " / ";
+	RESULT=op;
+:};
+OPLOG ::= op_or
+{:	
+	Simbolo op = new Simbolo();
+	op.valor1="<SPAN CLASS=\"palres\">or</SPAN>";
+	RESULT=op;
+:};
+OPLOG ::= op_and
+{:	
+	Simbolo op = new Simbolo();
+	op.valor1="<SPAN CLASS=\"palres\">and</SPAN>";
+	RESULT=op;
+:};
+
+FACTOR ::= SIMPVALUE:simpvalue
+{:	
+	Simbolo factor = new Simbolo();
+	factor.valor1=simpvalue.valor1;
+	RESULT=factor;
+:};
+FACTOR ::= op_not FACTOR:factor1
+{:	
+	Simbolo factor = new Simbolo();
+	factor.valor1="<SPAN CLASS=\"palres\">not &nbsp;"+factor1.valor1;
+	RESULT=factor;	
+:};
+FACTOR ::= abrir_paren EXP:exp cerrar_paren
+{:	
+	Simbolo factor = new Simbolo();
+	factor.valor1="("+exp.valor1+")";
+	RESULT=factor;
+:};
+FACTOR ::= identifier:iden SUBPPARAMLIST:subpparamlist
+{:	
+	Simbolo factor = new Simbolo();
+	factor.valor1="<A HREF=\"#"+iden+"\">"+iden+"</A>"+subpparamlist.valor1;
+	RESULT=factor;
+:};
+FACTOR ::= identifier:iden abrir_corchete EXP:exp cerrar_corchete
+{:	
+	Simbolo factor = new Simbolo();
+	factor.valor1="<A HREF=\"#"+iden+"\">"+iden+"</A>[<SPAN CLASS=\"cte\">"+exp.valor1+"</SPAN>]";
+	RESULT=factor;
+:};
+FACTOR ::= identifier:iden 
+{:	
+	Simbolo factor = new Simbolo();
+	factor.valor1="<A HREF=\"#"+iden+"\">"+iden+"</A>";
+	RESULT=factor;
+:};
+FACTOR ::= identifier:iden1 punto identifier:iden2
+{:	
+	Simbolo factor = new Simbolo();
+	factor.valor1="<A HREF=\"#"+iden1+"\">"+iden1+"</A>.<SPAN CLASS=\"ident\">"+iden2+"</SPAN>";
+	RESULT=factor;
+:};			
+SUBPPARAMLIST ::= abrir_paren EXPLIST:explist cerrar_paren
+{:	
+	Simbolo subpparamlist = new Simbolo();
+	subpparamlist.valor1="("+explist.valor1+")";
+	RESULT=subpparamlist;
+:};
+EXPLIST ::= EXP:exp 
+{:	
+	Simbolo explist = new Simbolo();
+	explist.valor1=exp.valor1;
+	RESULT=explist;
+:};
+EXPLIST ::= EXP:exp coma EXPLIST:explist1
+{:	
+	Simbolo explist = new Simbolo();
+	explist.valor1=exp.valor1+","+explist1.valor1;
+	RESULT=explist;
+:};
+
+PROC_CALL ::= identifier:iden SUBPPARAMLIST:subpparamlist
+{:	
+	Simbolo proc = new Simbolo();
+	proc.valor1="<A HREF=\"#"+iden+"\">"+iden+"</A>"+subpparamlist.valor1;
+	RESULT=proc;
+:};
+PROC_CALL ::= identifier:iden abrir_paren cerrar_paren
+{:	
+	Simbolo proc = new Simbolo();
+	proc.valor1="(<A HREF=\"#"+iden+"\">"+iden+"</A>)";
+	RESULT=proc;
+//////////---------------------------------------------------------------------------------
+:};
+
+EXEBLQ ::= DCLLIST_BLQ:dcllistblq begin SENTLIST:sentlist end
+{:
+	Simbolo exeblq = new Simbolo();
+	exeblq.valor1 = "<BR>"+dcllistblq.valor2
+		+"<BR/><SPAN CLASS=\"palres\">begin</SPAN>"
+		+"<DIV CLASS=\"tabul\">"+sentlist.valor1+"</DIV>"
+		+"<SPAN CLASS=\"palres\">end</SPAN>;<BR/>";
+	RESULT=exeblq;
+:};
+EXEBLQ ::= begin SENTLIST:sentlist end
+{:	
+	Simbolo exeblq = new Simbolo();
+	exeblq.valor1 ="<BR/><SPAN CLASS=\"palres\">begin</SPAN>"
+		+"<DIV CLASS=\"tabul\">"+sentlist.valor1+"</DIV>"
+		+"<SPAN CLASS=\"palres\">end</SPAN>;<BR/>";
+	RESULT=exeblq;
+:};
+
+DCLLIST_BLQ ::= DCLLIST_BLQ:dcllistblq1 DCL_BLQ:dclblq
+{:
+	Simbolo dcllistblq = new Simbolo();
+	dcllistblq.valor1=dcllistblq1.valor1 //dcllist1.valor1+dcl.valor1
+	+ dclblq.valor1;
+	dcllistblq.valor2=dcllistblq1.valor2
+	+ dclblq.valor2;   //dcllist1.valor2+dcl.valor2
+	RESULT=dcllistblq;
+:};
+
+DCLLIST_BLQ ::= DCL_BLQ:dclblq
+{:
+	Simbolo dcllistblq = new Simbolo();
+	dcllistblq.valor1=dclblq.valor1; //dcl.valor1
+	dcllistblq.valor2=dclblq.valor2;   //dcl.valor2
+	RESULT=dcllistblq;
+:};
+
+DCL_BLQ ::= DEFCTE:defcte
+{:	
+	Simbolo dclblq = new Simbolo();
+	dclblq.valor1 = "";
+	dclblq.valor2 = defcte.valor2;
+	RESULT= dclblq;
+:};
+DCL_BLQ ::= DEFTYPE:deftype
+{:	
+	Simbolo dclblq = new Simbolo();
+	dclblq.valor1 = "";
+	dclblq.valor2 = deftype.valor2;
+	RESULT= dclblq;
+:};
+DCL_BLQ ::= DEFVAR:defvar
+{:	
+	Simbolo dclblq = new Simbolo();
+	dclblq.valor1 = "";
+	dclblq.valor2 = defvar.valor2;
+	RESULT= dclblq;
+:};
